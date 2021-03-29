@@ -115,7 +115,7 @@ if __name__ == "__main__":
                    fps=args.fps,
                    start_carla=args.start_carla)
 
-
+    print('Carla Env done')
     # Set seeds
     seed = 0
     if isinstance(seed, int):
@@ -123,7 +123,7 @@ if __name__ == "__main__":
         np.random.seed(seed)
         random.seed(seed)
         env.seed(seed)
-
+    print('after seed')
     # Create model
     print("Creating model...")
     input_shape = np.array([vae.z_dim + len(measurements_to_include)])

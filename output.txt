@@ -1,0 +1,27 @@
+pygame 2.0.1 (SDL 2.0.14, Python 3.6.9)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+MAKING SESSION in models.py#1
+
+Model checkpoint restored from vae/models/seg_bce_cnn_zdim64_beta1_kl_tolerance0.0_data//checkpoints/model.ckpt-255
+Creating environment...
+After Client Creation
+Spawned actor "vehicle.lincoln.mkz2017"
+After vehicle
+after world tick
+Spawned actor "sensor.camera.rgb"
+Spawned actor "sensor.camera.rgb"
+after camera
+waypoiont
+Carla Env done
+after seed
+Creating model...
+MAKING SESSION in ppo.py
+
+Running eval...
+Done!
+Destroying all spawned actors
+Destroying  <wrappers.Vehicle object at 0x7f9d5c10c860> ...
+Destroying  <wrappers.CollisionSensor object at 0x7f9d5c10ca90> ...
+Destroying  <wrappers.LaneInvasionSensor object at 0x7f9d5c10cb38> ...
+Destroying  <wrappers.Camera object at 0x7f9d5cd9d470> ...
+Destroying  <wrappers.Camera object at 0x7f9d5cd9d358> ...

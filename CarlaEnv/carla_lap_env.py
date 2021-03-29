@@ -45,10 +45,10 @@ class CarlaLapEnv(gym.Env):
         "render.modes": ["human", "rgb_array", "rgb_array_no_hud", "state_pixels"]
     }
 
-    def __init__(self, host="127.0.0.1", port=2000,
+    def __init__(self, host='localhost', port=2000,
                  viewer_res=(1280, 720), obs_res=(1280, 720),
                  reward_fn=None, encode_state_fn=None, 
-                 synchronous=True, fps=30, action_smoothing=0.9,
+                 synchronous=True, fps=10, action_smoothing=0.9,
                  start_carla=True):
         """
             Initializes a gym-like environment that can be used to interact with CARLA.
@@ -94,20 +94,24 @@ class CarlaLapEnv(gym.Env):
         # Start CARLA from CARLA_ROOT
         self.carla_process = None
         if start_carla:
-            if "CARLA_ROOT" not in os.environ:
+            pass
+            '''if "CARLA_ROOT" not in os.environ:
                 raise Exception("${CARLA_ROOT} has not been set!")
-            dist_dir = os.path.join(os.environ["CARLA_ROOT"], "Dist")
+            dist_dir = os.path.join(os.environ["CARLA_ROOT"], "dist")
             if not os.path.isdir(dist_dir):
-                raise Exception("Expected to find directory \"Dist\" under ${CARLA_ROOT}!")
+                raise Exception("Expected to find directory \"dist\" under ${CARLA_ROOT}!")
             sub_dirs = [os.path.join(dist_dir, sub_dir) for sub_dir in os.listdir(dist_dir) if os.path.isdir(os.path.join(dist_dir, sub_dir))]
             if len(sub_dirs) == 0:
                 raise Exception("Could not find a packaged distribution of CALRA! " +
                                 "(try building CARLA with the \"make package\" " +
                                 "command in ${CARLA_ROOT})")
             sub_dir = sub_dirs[0]
-            carla_path = os.path.join(sub_dir, "LinuxNoEditor", "CarlaUE4.sh")
+
+            #carla_path = os.path.join(sub_dir, "CarlaUE4.sh")
+            carla_path = '/home/student/Desktop/PES1201700183/CarlaUE4.sh'
+
             launch_command = [carla_path]
-            launch_command += ["Town07"]
+            launch_command += ["Town02"]
             if synchronous: launch_command += ["-benchmark"]
             launch_command += ["-fps=%i" % fps]
             print("Running command:")
@@ -117,7 +121,7 @@ class CarlaLapEnv(gym.Env):
             for line in self.carla_process.stdout:
                 if "LogCarla: Number Of Vehicles" in line:
                     break
-            time.sleep(2)
+            time.sleep(2)'''
 
         # Initialize pygame for visualization
         pygame.init()
@@ -144,11 +148,15 @@ class CarlaLapEnv(gym.Env):
         self.world = None
         try:
             # Connect to carla
-            self.client = carla.Client(host, port)
-            self.client.set_timeout(60.0)
+            self.client = carla.Client('127.0.0.1', 2000)
+            #self.client.set_timeout(60.0)
 
             # Create world wrapper
+            self.client.set_timeout(2.0)
             self.world = World(self.client)
+            #self.world = self.client.load_world('Town02')
+            #self.world = self.client.get_world()
+            print('After Client Creation')
 
             if self.synchronous:
                 settings = self.world.get_settings()
@@ -160,16 +168,20 @@ class CarlaLapEnv(gym.Env):
             lap_start_wp = self.world.map.get_waypoint(self.world.map.get_spawn_points()[1].location)
             spawn_transform = lap_start_wp.transform
             spawn_transform.location += carla.Location(z=1.0)
-
+    
             # Create vehicle and attach camera to it
             self.vehicle = Vehicle(self.world, spawn_transform,
                                    on_collision_fn=lambda e: self._on_collision(e),
                                    on_invasion_fn=lambda e: self._on_invasion(e))
+            print('After vehicle')
 
             # Create hud
             self.hud = HUD(width, height)
             self.hud.set_vehicle(self.vehicle)
             self.world.on_tick(self.hud.on_world_tick)
+
+            print("after world tick")
+            
 
             # Create cameras
             self.dashcam = Camera(self.world, out_width, out_height,
@@ -180,6 +192,9 @@ class CarlaLapEnv(gym.Env):
                                   transform=camera_transforms["spectator"],
                                   attach_to=self.vehicle, on_recv_image=lambda e: self._set_viewer_image(e),
                                   sensor_tick=0.0 if self.synchronous else 1.0/self.fps)
+
+            print("after camera")
+       
         except Exception as e:
             self.close()
             raise e
@@ -190,6 +205,7 @@ class CarlaLapEnv(gym.Env):
         self.current_waypoint_index = 0
         self.checkpoint_waypoint_index = 0
 
+        print("waypoiont")
         # Reset env to set initial state
         self.reset()
 

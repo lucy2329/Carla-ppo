@@ -57,8 +57,8 @@ def train(params, start_carla=True, restart=False):
     
     # Override params for logging
     params["vae_z_dim"] = vae.z_dim
-    params["vae_model_type"] = "mlp" if isinstance(vae, MlpVAE) else "cnn"
-
+    #params["vae_model_type"] = "mlp" if isinstance(vae, MlpVAE) else "cnn"
+    params["vae_model_type"] = "cnn"
     print("")
     print("Training parameters:")
     for k, v, in params.items(): print(f"  {k}: {v}")
@@ -127,9 +127,12 @@ def train(params, start_carla=True, restart=False):
             model.write_value_to_summary("eval/center_lane_deviation", env.center_lane_deviation, episode_idx)
             model.write_value_to_summary("eval/average_center_lane_deviation", env.center_lane_deviation / env.step_count, episode_idx)
             model.write_value_to_summary("eval/distance_over_deviation", env.distance_traveled / env.center_lane_deviation, episode_idx)
+            model.save()
+        
             if eval_reward > best_eval_reward:
-                model.save()
+                #model.save()
                 best_eval_reward = eval_reward
+            print('Best Eval %f and Current Reward %f'%(best_eval_reward,eval_reward))
 
         # Reset environment
         state, terminal_state, total_reward = env.reset(), False, 0
@@ -238,7 +241,7 @@ if __name__ == "__main__":
     parser.add_argument("--vae_model", type=str,
                         default="vae/models/seg_bce_cnn_zdim64_beta1_kl_tolerance0.0_data/",
                         help="Trained VAE model to load")
-    parser.add_argument("--vae_model_type", type=str, default=None, help="VAE model type (\"cnn\" or \"mlp\")")
+    parser.add_argument("--vae_model_type", type=str, default='cnn', help="VAE model type (\"cnn\" or \"mlp\")")
     parser.add_argument("--vae_z_dim", type=int, default=None, help="Size of VAE bottleneck")
 
     # Environment settings

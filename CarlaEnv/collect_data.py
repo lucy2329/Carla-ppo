@@ -81,7 +81,7 @@ class CarlaDataCollector:
             sub_dir = sub_dirs[0]
             carla_path = os.path.join(sub_dir, "LinuxNoEditor", "CarlaUE4.sh")
             launch_command = [carla_path]
-            launch_command += ["Town07"]
+            launch_command += ["Town05"]
             if synchronous: launch_command += ["-benchmark"]
             launch_command += ["-fps=%i" % fps]
             print("Running command:")

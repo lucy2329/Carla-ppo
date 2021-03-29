@@ -30,9 +30,9 @@ def create_reward_fn(reward_fn, max_speed=-1):
             terminal_reason = "Vehicle stopped"
 
         # Stop if distance from center > max distance
-        if env.distance_from_center > max_distance:
-            env.terminal_state = True
-            terminal_reason = "Off-track"
+        # if env.distance_from_center > max_distance:
+        #     env.terminal_state = True
+        #     terminal_reason = "Off-track"
 
         # Stop if speed is too high
         if max_speed > 0 and speed_kmh > max_speed:
