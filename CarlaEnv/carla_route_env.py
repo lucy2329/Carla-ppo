@@ -33,11 +33,11 @@ class CarlaRouteEnv(gym.Env):
         in order for this option to work.
 
         And also remember to set the -fps and -synchronous arguments to match the
-        command-line arguments of the simulator (not needed with -start_carla.) 
-        
+        command-line arguments of the simulator (not needed with -start_carla.)
+
         Note that you may also need to add the following line to
         Unreal/CarlaUE4/Config/DefaultGame.ini to have the map included in the package:
-        
+
         +MapsToCook=(FilePath="/Game/Carla/Maps/Town07")
     """
 
@@ -55,7 +55,7 @@ class CarlaRouteEnv(gym.Env):
 
             Connects to a running CARLA enviromment (tested on version 0.9.5) and
             spwans a lincoln mkz2017 passenger car with automatic transmission.
-            
+
             This vehicle can be controlled using the step() function,
             taking an action that consists of [steering_angle, throttle].
 
@@ -81,7 +81,7 @@ class CarlaRouteEnv(gym.Env):
                 1.0 = max smoothing, 0.0 = no smoothing
             fps (int):
                 FPS of the client. If fps <= 0 then use unbounded FPS.
-                Note: Sensors will have a tick rate of fps when fps > 0, 
+                Note: Sensors will have a tick rate of fps when fps > 0,
                 otherwise they will tick as fast as possible.
             synchronous (bool):
                 If True, run in synchronous mode (read the comment above for more info)
@@ -157,7 +157,7 @@ class CarlaRouteEnv(gym.Env):
                 self.world.apply_settings(settings)
 
             # Create vehicle and attach camera to it
-            self.vehicle = Vehicle(self.world, self.world.map.get_spawn_points()[0],
+            self.vehicle = Vehicle(self.world, self.world.map.get_spawn_points()[random.randint(0, 10)],
                                    on_collision_fn=lambda e: self._on_collision(e),
                                    on_invasion_fn=lambda e: self._on_invasion(e))
 
@@ -198,7 +198,7 @@ class CarlaRouteEnv(gym.Env):
         self.observation = self.observation_buffer = None   # Last received observation
         self.viewer_image = self.viewer_image_buffer = None # Last received image to show in the viewer
         self.step_count = 0
-        
+
         # Init metrics
         self.total_reward = 0.0
         self.previous_location = self.vehicle.get_transform().location
@@ -216,7 +216,7 @@ class CarlaRouteEnv(gym.Env):
         self.vehicle.control.throttle = float(0.0)
         #self.vehicle.control.brake = float(0.0)
         self.vehicle.tick()
-        
+
         # Generate waypoints along the lap
         self.start_wp, self.end_wp = [self.world.map.get_waypoint(spawn.location) for spawn in np.random.choice(self.world.map.get_spawn_points(), 2, replace=False)]
         self.route_waypoints = compute_route_waypoints(self.world.map, self.start_wp, self.end_wp, resolution=1.0)
@@ -238,7 +238,7 @@ class CarlaRouteEnv(gym.Env):
                     pass
         else:
             time.sleep(2.0)
-        
+
     def close(self):
         if self.carla_process:
             self.carla_process.terminate()
@@ -309,7 +309,7 @@ class CarlaRouteEnv(gym.Env):
             else:
                 # Sleep to keep a steady fps
                 self.clock.tick_busy_loop(self.fps)
-            
+
             # Update average fps (for saving recordings)
             if action is not None:
                 self.average_fps = self.average_fps * 0.5 + self.clock.get_fps() * 0.5
@@ -321,7 +321,7 @@ class CarlaRouteEnv(gym.Env):
             self.vehicle.control.steer    = self.vehicle.control.steer * self.action_smoothing + steer * (1.0-self.action_smoothing)
             self.vehicle.control.throttle = self.vehicle.control.throttle * self.action_smoothing + throttle * (1.0-self.action_smoothing)
             #self.vehicle.control.brake = self.vehicle.control.brake * self.action_smoothing + brake * (1.0-self.action_smoothing)
-        
+
         # Tick game
         self.hud.tick(self.world, self.clock)
         self.world.tick()
@@ -381,7 +381,7 @@ class CarlaRouteEnv(gym.Env):
         # Terminal on max distance
         if self.distance_traveled >= self.max_distance:
             self.terminal_state = True
-        
+
         # Call external reward fn
         self.last_reward = self.reward_fn(self)
         self.total_reward += self.last_reward
@@ -398,7 +398,7 @@ class CarlaRouteEnv(gym.Env):
         if pygame.key.get_pressed()[K_ESCAPE]:
             self.close()
             self.terminal_state = True
-        
+
         return encoded_state, self.last_reward, self.terminal_state, { "closed": self.closed }
 
     def _draw_path(self, life_time=60.0, skip=0):
@@ -463,7 +463,7 @@ def reward_fn(env):
         # If distance from center > 3, stop
         if env.distance_from_center > 3.0:
             env.terminal_state = True
-        
+
     fwd    = vector(env.vehicle.get_velocity())
     wp_fwd = vector(env.current_waypoint.transform.rotation.get_forward_vector())
     if np.dot(fwd[:2], wp_fwd[:2]) > 0:

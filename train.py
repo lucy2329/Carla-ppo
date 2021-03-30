@@ -118,7 +118,8 @@ def train(params, start_carla=True, restart=False):
         episode_idx = model.get_episode_idx()
         
         # Run evaluation periodically
-        if episode_idx % eval_interval == 0:
+
+        if episode_idx % 1 == 0:
             video_filename = os.path.join(model.video_dir, "episode{}.avi".format(episode_idx))
             eval_reward = run_eval(env, model, video_filename=video_filename)
             model.write_value_to_summary("eval/reward", eval_reward, episode_idx)
@@ -127,10 +128,10 @@ def train(params, start_carla=True, restart=False):
             model.write_value_to_summary("eval/center_lane_deviation", env.center_lane_deviation, episode_idx)
             model.write_value_to_summary("eval/average_center_lane_deviation", env.center_lane_deviation / env.step_count, episode_idx)
             model.write_value_to_summary("eval/distance_over_deviation", env.distance_traveled / env.center_lane_deviation, episode_idx)
-            model.save()
+            #model.save()
         
             if eval_reward > best_eval_reward:
-                #model.save()
+                model.save()
                 best_eval_reward = eval_reward
             print('Best Eval %f and Current Reward %f'%(best_eval_reward,eval_reward))
 

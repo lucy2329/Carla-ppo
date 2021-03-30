@@ -165,7 +165,9 @@ class CarlaLapEnv(gym.Env):
 
             # Get spawn location
             #lap_start_wp = self.world.map.get_waypoint(carla.Location(x=-180.0, y=110))
-            lap_start_wp = self.world.map.get_waypoint(self.world.map.get_spawn_points()[1].location)
+            randomSpawn = random.choice(self.world.map.get_spawn_points())
+            fixedSpawn = self.world.map.get_spawn_points()[1]
+            lap_start_wp = self.world.map.get_waypoint(randomSpawn.location)
             spawn_transform = lap_start_wp.transform
             spawn_transform.location += carla.Location(z=1.0)
     

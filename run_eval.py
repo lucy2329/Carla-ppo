@@ -77,7 +77,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Runs the model in evaluation mode")
     
     # Model params
-    parser.add_argument("--model_name", type=str, required=True, help="Name of the model to train. Output written to models/model_name")
+    parser.add_argument("--model_name", default='new_model_train_v2', type=str, required=False, help="Name of the model to train. Output written to models/model_name")
     parser.add_argument("--reward_fn", type=str,
                         default="reward_speed_centering_angle_multiply",
                         help="Reward function to use. See reward_functions.py for more info.")
